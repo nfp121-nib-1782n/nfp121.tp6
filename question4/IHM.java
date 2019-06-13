@@ -1,5 +1,4 @@
 package question4;
-
 import question1.Contributeur;
 import question1.GroupeDeContributeurs;
 import question2.*;
@@ -16,8 +15,8 @@ import java.io.ByteArrayOutputStream;
 public class IHM extends JFrame {
 
     private JTextArea resultat = new JTextArea("", 7,60);
-    private JButton debiter = new JButton("dÃ©biter");
-    private JButton crediter = new JButton("crÃ©diter");
+    private JButton debiter = new JButton("débiter");
+    private JButton crediter = new JButton("créditer");
     private JTextField somme = new JTextField(4);
 
     private GroupeDeContributeurs g;
@@ -44,20 +43,41 @@ public class IHM extends JFrame {
         g1.ajouter(new Contributeur("g1_b1",200));
         g.ajouter(g1);
 
-        try{
-            resultat.setText(Main.arbreXML(g)); //actualiser();
-        }catch(Exception e){}
+        actualiser();
 
-        debiter.addActionListener(null/* a completer */);
-        crediter.addActionListener(null/* a completer */);
+        debiter.addActionListener(e -> debiter());
+        crediter.addActionListener(e -> crediter());
 
-            
         this.pack();
         this.setVisible(true);
+    }
+
+    private void actualiser() {
+        try  {
+            resultat.setText(Main.arbreXML(g));   
+        } catch(Exception e) {}
+    }
+
+    private void debiter() {
+        TransactionDebit transaction = new TransactionDebit(g);
+        try {
+            transaction.beginTransaction();
+            transaction.debit(Integer.parseInt(somme.getText()));
+            transaction.endTransaction();
+            actualiser();
+        } catch(Exception e) {
+            transaction.rollbackTransaction();
+        }
+    }
+    
+    private void crediter() {
+        try {
+            g.credit(Integer.parseInt(somme.getText()));
+            actualiser();
+        } catch(Exception e) {}
     }
 
     public static void main() {
         new IHM();    
     }    
-
 }
